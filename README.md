@@ -4,5 +4,5 @@ These are a set of example applications that use TCP and UDP sockets as well as 
 
 To compile the http client, you will need libcurl to be installed, with something like:
 ```
-$ apt-get install libcurl4-openssl-dev
+$ sudo apt-get install libcurl4-openssl-dev
 ```
