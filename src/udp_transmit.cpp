@@ -14,7 +14,7 @@
 int main(int argc, char *argv[])
 {
     if (argc < 4) {
-        printf("Usage: %s host port message\tConnect to host, port and send message\n", argv[0]); //arg0 is the program name
+        printf("Usage: %s host port message\tTransmit a UDP packet to specified host and port containing the message\n", argv[0]); //arg0 is the program name
         return 1;
     }
 
@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
     struct addrinfo hints;
     struct addrinfo *address;
     memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_family = AF_UNSPEC; // IPv4 or IPv6
+    hints.ai_family = AF_INET; // IPv4
     hints.ai_socktype = SOCK_DGRAM; // UDP
     int s = getaddrinfo(argv[1], argv[2], &hints, &address); // arg1 is the host name and arg2 is the port number
     if (s != 0) {
@@ -48,15 +48,9 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // Bind it to the address and port 
-    if (0 != bind(socket_fd, address->ai_addr, address->ai_addrlen)) {
-        perror("Failed to bind");
-        return 1;
-    }
-
     // Send the message 
     char *buffer_to_send = argv[3]; // Use the third command line argument
-    s = sendto(socket_fd, buffer_to_send, strlen(buffer_to_send), 0, address->ai_addr, sizeof(struct addrinfo));
+    s = sendto(socket_fd, buffer_to_send, strlen(buffer_to_send), 0, address->ai_addr, address->ai_addrlen);
     if (s == -1) {
         perror("Failed to send.");
         return 1;

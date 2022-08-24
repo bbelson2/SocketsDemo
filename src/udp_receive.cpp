@@ -14,7 +14,7 @@
 
 int main(int argc, char *argv[])
 {
-    if (argc < 2) {
+    if (argc != 2) {
         printf("Usage: %s port\tListen on the specified port\n", argv[0]);
         return 1;
     }
@@ -26,8 +26,9 @@ int main(int argc, char *argv[])
     struct addrinfo hints;
     struct addrinfo *address;
     memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_family = AF_UNSPEC; // IPv4 or IPv6
+    hints.ai_family = AF_INET; // IPv4
     hints.ai_socktype = SOCK_DGRAM; // UDP
+    hints.ai_flags = AI_PASSIVE; // interpret a NULL hostname as a wildcard (to accept data from anywhere)
     int s = getaddrinfo(NULL, argv[1], &hints, &address); 
     if (s != 0) {
         fprintf(stderr, "Failed to resolve address: %s\n", gai_strerror(s));
