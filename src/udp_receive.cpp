@@ -2,7 +2,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <string.h>
-#include <errno.h>
+//#include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <arpa/inet.h>
@@ -64,26 +64,32 @@ int main(int argc, char *argv[])
             .events = POLLIN | POLLERR,
         },
         // add here if there are other files/sockets to monitor
+        {
+            .fd = 0,
+            .events = POLLIN | POLLERR,
+        },
     };
 
     // Event loop
-    static char buf [512];
+    static char buf [2048];
     for (;;) {
         // Wait for events
         poll(pfds, sizeof(pfds)/sizeof(struct pollfd), -1);
 
         // Check if a packet arrived
-        if (pfds[0].revents) {
-            // Read the incoming packet
-            ssize_t bytes_read = read(socket_fd, buf, sizeof(buf) - 1); // with room for a trailing null
-            if (bytes_read < 0) {
-                return 0;
-            }
-            // Make the message null terminated
-            buf[bytes_read] = 0;
+        for (int i = 0; i < 2; i++) {
+            if (pfds[i].revents) {
+                // Read the incoming packet
+                ssize_t bytes_read = read(pfds[i].fd, buf, sizeof(buf) - 1); // with room for a trailing null
+                if (bytes_read < 0) {
+                    return 0;
+                }
+                // Make the message null terminated
+                buf[bytes_read] = 0;
 
-            // Print it out
-            printf("Received: %s\n", buf);
+                // Print it out
+                printf("Received on %d: %lu bytes [%d]\n", i, bytes_read, *(uint16_t*)buf);
+            }
         }
     }
     
